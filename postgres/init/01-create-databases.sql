@@ -1,0 +1,5 @@
+CREATE DATABASE gamingcastle_users;
+CREATE DATABASE gamingcastle_bookings;
+CREATE DATABASE gamingcastle_payments;
+CREATE DATABASE gamingcastle_tournaments;
+CREATE DATABASE gamingcastle_loyalty;
