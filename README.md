@@ -24,7 +24,11 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Only `user-service` is currently containerized. Check its availability at `http://localhost:8081` or inspect its container with `docker compose ps` and `docker compose logs user-service`.
+The API gateway is available at `http://localhost:8080`. The backend services
+are published on ports 8081 through 8086: user, booking, payment, tournament,
+loyalty, and notification, respectively. Eureka is available at
+`http://localhost:8761`. Inspect service status with `docker compose ps` and
+logs with `docker compose logs <service>`.
 
 Stop the services and retain database data with:
 

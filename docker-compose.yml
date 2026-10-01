@@ -1,5 +1,239 @@
 # Add new services below. Each service needs: image, build context, env vars, depends_on.
 services:
+  api-gateway:
+    image: ghcr.io/seng34213/api-gateway:${IMAGE_TAG:-latest}
+    build:
+      context: ../backend/api-gateway
+      dockerfile: Dockerfile
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  eureka-server:
+    image: ghcr.io/seng34213/eureka-server:${IMAGE_TAG:-latest}
+    build:
+      context: ../backend/eureka-server
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8761"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  booking-service:
+    image: ghcr.io/seng34213/booking-service:${IMAGE_TAG:-latest}
+    build:
+      context: ../backend/booking-service
+      dockerfile: Dockerfile
+    depends_on:
+      booking-postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${BOOKING_DB_URL:?Set BOOKING_DB_URL in .env}
+      SPRING_DATASOURCE_USERNAME: ${BOOKING_DB_USER:?Set BOOKING_DB_USER in .env}
+      SPRING_DATASOURCE_PASSWORD: ${BOOKING_DB_PASSWORD:?Set BOOKING_DB_PASSWORD in .env}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8082"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  booking-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gamingcastle_bookings
+      POSTGRES_USER: ${BOOKING_DB_USER:?Set BOOKING_DB_USER in .env}
+      POSTGRES_PASSWORD: ${BOOKING_DB_PASSWORD:?Set BOOKING_DB_PASSWORD in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - booking-service-postgres-data:/var/lib/postgresql/data
+
+  loyalty-service:
+    image: ghcr.io/seng34213/loyalty-service:${IMAGE_TAG:-latest}
+    build:
+      context: ../backend/loyalty-service
+      dockerfile: Dockerfile
+    depends_on:
+      loyalty-postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${LOYALTY_DB_URL:?Set LOYALTY_DB_URL in .env}
+      SPRING_DATASOURCE_USERNAME: ${LOYALTY_DB_USER:?Set LOYALTY_DB_USER in .env}
+      SPRING_DATASOURCE_PASSWORD: ${LOYALTY_DB_PASSWORD:?Set LOYALTY_DB_PASSWORD in .env}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8085:8085"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8085"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  loyalty-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gamingcastle_loyality
+      POSTGRES_USER: ${LOYALTY_DB_USER:?Set LOYALTY_DB_USER in .env}
+      POSTGRES_PASSWORD: ${LOYALTY_DB_PASSWORD:?Set LOYALTY_DB_PASSWORD in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - loyalty-service-postgres-data:/var/lib/postgresql/data
+
+  notification-service:
+    image: ghcr.io/seng34213/notification-service:${IMAGE_TAG:-latest}
+    build:
+      context: ../backend/notification-service
+      dockerfile: Dockerfile
+    depends_on:
+      notification-postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${NOTIFICATION_DB_URL:?Set NOTIFICATION_DB_URL in .env}
+      SPRING_DATASOURCE_USERNAME: ${NOTIFICATION_DB_USER:?Set NOTIFICATION_DB_USER in .env}
+      SPRING_DATASOURCE_PASSWORD: ${NOTIFICATION_DB_PASSWORD:?Set NOTIFICATION_DB_PASSWORD in .env}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+      TWILIO_DEFAULT_COUNTRY_CODE: ${TWILIO_DEFAULT_COUNTRY_CODE:-+94}
+    ports:
+      - "8086:8086"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8086"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  notification-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gamingcastle_notifications
+      POSTGRES_USER: ${NOTIFICATION_DB_USER:?Set NOTIFICATION_DB_USER in .env}
+      POSTGRES_PASSWORD: ${NOTIFICATION_DB_PASSWORD:?Set NOTIFICATION_DB_PASSWORD in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - notification-service-postgres-data:/var/lib/postgresql/data
+
+  payment-service:
+    image: ghcr.io/seng34213/payment-service:${IMAGE_TAG:-latest}
+    build:
+      context: ../backend/payment-service
+      dockerfile: Dockerfile
+    depends_on:
+      payment-postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${PAYMENT_DB_URL:?Set PAYMENT_DB_URL in .env}
+      SPRING_DATASOURCE_USERNAME: ${PAYMENT_DB_USER:?Set PAYMENT_DB_USER in .env}
+      SPRING_DATASOURCE_PASSWORD: ${PAYMENT_DB_PASSWORD:?Set PAYMENT_DB_PASSWORD in .env}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8083:8083"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8083"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  payment-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gamingcastle_payments
+      POSTGRES_USER: ${PAYMENT_DB_USER:?Set PAYMENT_DB_USER in .env}
+      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD:?Set PAYMENT_DB_PASSWORD in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - payment-service-postgres-data:/var/lib/postgresql/data
+
+  tournament-service:
+    image: ghcr.io/seng34213/tournament-service:${IMAGE_TAG:-latest}
+    build:
+      context: ../backend/tournament-service
+      dockerfile: Dockerfile
+    depends_on:
+      tournament-postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${TOURNAMENT_DB_URL:?Set TOURNAMENT_DB_URL in .env}
+      SPRING_DATASOURCE_USERNAME: ${TOURNAMENT_DB_USER:?Set TOURNAMENT_DB_USER in .env}
+      SPRING_DATASOURCE_PASSWORD: ${TOURNAMENT_DB_PASSWORD:?Set TOURNAMENT_DB_PASSWORD in .env}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8084:8084"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8084"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  tournament-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gamingcastle_tournaments
+      POSTGRES_USER: ${TOURNAMENT_DB_USER:?Set TOURNAMENT_DB_USER in .env}
+      POSTGRES_PASSWORD: ${TOURNAMENT_DB_PASSWORD:?Set TOURNAMENT_DB_PASSWORD in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - tournament-service-postgres-data:/var/lib/postgresql/data
+
   user-service:
     image: ghcr.io/seng34213/user-service:${IMAGE_TAG:-latest}
     build:
@@ -9,9 +243,9 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/gamingcastle_users
-      DB_USER: ${DB_USER:-gc_admin}
-      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      DB_URL: ${USER_DB_URL:?Set USER_DB_URL in .env}
+      DB_USER: ${USER_DB_USER:?Set USER_DB_USER in .env}
+      DB_PASSWORD: ${USER_DB_PASSWORD:?Set USER_DB_PASSWORD in .env}
       EUREKA_CLIENT_ENABLED: "false"
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
@@ -22,8 +256,8 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: gamingcastle_users
-      POSTGRES_USER: ${DB_USER:-gc_admin}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      POSTGRES_USER: ${USER_DB_USER:?Set USER_DB_USER in .env}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD:?Set USER_DB_PASSWORD in .env}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 5s
@@ -33,4 +267,9 @@ services:
       - user-service-postgres-data:/var/lib/postgresql/data
 
 volumes:
+  booking-service-postgres-data:
+  loyalty-service-postgres-data:
+  notification-service-postgres-data:
+  payment-service-postgres-data:
+  tournament-service-postgres-data:
   user-service-postgres-data:
