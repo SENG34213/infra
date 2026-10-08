@@ -45,11 +45,15 @@ services:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
+      loyalty-service:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: ${BOOKING_DB_URL:?Set BOOKING_DB_URL in .env}
       SPRING_DATASOURCE_USERNAME: ${BOOKING_DB_USER:?Set BOOKING_DB_USER in .env}
       SPRING_DATASOURCE_PASSWORD: ${BOOKING_DB_PASSWORD:?Set BOOKING_DB_PASSWORD in .env}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
+      LOYALTY_BASE_URL: http://loyalty-service:8085
     ports:
       - "8082:8082"
     healthcheck:
@@ -88,6 +92,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${LOYALTY_DB_USER:?Set LOYALTY_DB_USER in .env}
       SPRING_DATASOURCE_PASSWORD: ${LOYALTY_DB_PASSWORD:?Set LOYALTY_DB_PASSWORD in .env}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
     ports:
       - "8085:8085"
     healthcheck:
@@ -168,11 +173,15 @@ services:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
+      loyalty-service:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: ${PAYMENT_DB_URL:?Set PAYMENT_DB_URL in .env}
       SPRING_DATASOURCE_USERNAME: ${PAYMENT_DB_USER:?Set PAYMENT_DB_USER in .env}
       SPRING_DATASOURCE_PASSWORD: ${PAYMENT_DB_PASSWORD:?Set PAYMENT_DB_PASSWORD in .env}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
+      LOYALTY_BASE_URL: http://loyalty-service:8085
     ports:
       - "8083:8083"
     healthcheck:
