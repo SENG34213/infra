@@ -63,6 +63,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${BOOKING_DB_USER:?Set BOOKING_DB_USER in .env}
       SPRING_DATASOURCE_PASSWORD: ${BOOKING_DB_PASSWORD:?Set BOOKING_DB_PASSWORD in .env}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      TZ: Asia/Colombo
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Colombo
       GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
       LOYALTY_BASE_URL: http://loyalty-service:8085
     ports:
@@ -103,6 +105,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${LOYALTY_DB_USER:?Set LOYALTY_DB_USER in .env}
       SPRING_DATASOURCE_PASSWORD: ${LOYALTY_DB_PASSWORD:?Set LOYALTY_DB_PASSWORD in .env}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      TZ: Asia/Colombo
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Colombo
       GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
     ports:
       - "8085:8085"
@@ -151,6 +155,8 @@ services:
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
       TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
       TWILIO_DEFAULT_COUNTRY_CODE: ${TWILIO_DEFAULT_COUNTRY_CODE:-+94}
+      TZ: Asia/Colombo
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Colombo
     ports:
       - "8086:8086"
     healthcheck:
@@ -191,6 +197,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${PAYMENT_DB_USER:?Set PAYMENT_DB_USER in .env}
       SPRING_DATASOURCE_PASSWORD: ${PAYMENT_DB_PASSWORD:?Set PAYMENT_DB_PASSWORD in .env}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      TZ: Asia/Colombo
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Colombo
       GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
       LOYALTY_BASE_URL: http://loyalty-service:8085
     ports:
@@ -231,6 +239,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${TOURNAMENT_DB_USER:?Set TOURNAMENT_DB_USER in .env}
       SPRING_DATASOURCE_PASSWORD: ${TOURNAMENT_DB_PASSWORD:?Set TOURNAMENT_DB_PASSWORD in .env}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      TZ: Asia/Colombo
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Colombo
     ports:
       - "8084:8084"
     healthcheck:
@@ -271,6 +281,8 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:?Set GATEWAY_INTERNAL_SECRET in .env}
+      TZ: Asia/Colombo
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Colombo
     ports:
       - "8081:8081"
     healthcheck:
