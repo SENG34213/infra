@@ -27,8 +27,9 @@ docker compose up --build
 The API gateway is available at `http://localhost:8080`. The backend services
 are published on ports 8081 through 8086: user, booking, payment, tournament,
 loyalty, and notification, respectively. Eureka is available at
-`http://localhost:8761`. Inspect service status with `docker compose ps` and
-logs with `docker compose logs <service>`.
+`http://localhost:8761`. The notification socket server runs internally on port
+5001 (proxied through the frontend nginx under `/realtime/`). Inspect service
+status with `docker compose ps` and logs with `docker compose logs <service>`.
 
 Stop the services and retain database data with:
 
