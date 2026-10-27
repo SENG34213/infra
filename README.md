@@ -2,6 +2,20 @@
 
 Deployment and infrastructure configuration for the Gaming Castle microservices. Docker Compose lives here; service source code and each service's Dockerfile stay in the `backend` repository.
 
+## 🚀 Live Deployment & Test Credentials
+
+- **Live Application URL**: [http://54.234.186.115:4200](http://54.234.186.115:4200)
+
+### Test Credentials
+
+| Role | Email / Username | Password |
+| :--- | :--- | :--- |
+| **User (Customer)** | `thivyamahe001@gmail.com` | `thivyamahe001` |
+| **Admin** | `gamingcastle_admin@gmail.com` | `Admin@12345` |
+
+---
+
+
 ## Prerequisites
 
 - Docker
@@ -47,5 +61,5 @@ docker compose down -v
 1. Add the service's Dockerfile beside its source code in `backend`.
 2. Add one service block to this repository's `docker-compose.yml`, including its image and backend-relative build context.
 3. Add the required environment variables and health-aware `depends_on` entries; put local secrets in `.env` only.
-4. Run `docker compose config` and `docker compose up --build` to validate and start the service.# infra
-Infrastructure as Code — Docker, docker-compose, CI/CD pipeline and deployment scripts
+4. Run `docker compose config` and `docker compose up --build` to validate and start the service.
+
