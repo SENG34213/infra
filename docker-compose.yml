@@ -14,6 +14,7 @@ services:
       - "4200:80"
 
   notification-socket-server:
+    image: ghcr.io/seng34213/notification-socket-server:${IMAGE_TAG:-latest}
     build:
       context: ../frontend/notification-socket-server
       dockerfile: Dockerfile
